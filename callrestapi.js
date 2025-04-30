@@ -1,5 +1,16 @@
 var url = "https://bikes-mysql-backend.onrender.com/api/bikes";
 
+$(document).ready(function () {
+  getBikes();
+
+  $('#getBikesBtn').on('click', getBikes);
+
+  $('#bikeForm').on('submit', function (e) {
+    e.preventDefault();
+    postBike();
+  });
+});
+
 function postBike() {
   const brand = $('#brand').val().trim();
   const model = $('#model').val().trim();
@@ -26,8 +37,9 @@ function postBike() {
     processData: false,
     contentType: false,
     success: function () {
+      alert("✅ Bicicleta guardada");
       getBikes();
-      $('#bikeForm')[0].reset(); // Limpia el formulario
+      $('#bikeForm')[0].reset()
     },
     error: function () {
       alert("❌ Error al guardar bicicleta");
@@ -37,6 +49,8 @@ function postBike() {
 
 function getBikes() {
   $.getJSON(url, function (response) {
+    console.log("✅ Respuesta del backend:", response);
+
     const bikes = Array.isArray(response) ? response : response.bikes;
 
     let html = `
@@ -68,7 +82,8 @@ function getBikes() {
 
     html += `</tbody></table>`;
     $('#resultado').html(html);
-  }).fail(() => {
+  }).fail((xhr) => {
+    console.error("❌ Error en el GET:", xhr);
     alert("❌ Error al obtener bicicletas");
   });
 }
