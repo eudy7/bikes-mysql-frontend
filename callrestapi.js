@@ -124,4 +124,10 @@ function editBike(id) {
     data: JSON.stringify({ brand, model, price, description }),
     success: function () {
       alert("Bicicleta actualizada");
-      getB
+      getBikes();
+    },
+    error: function () {
+      alert("Error al actualizar la bicicleta");
+    }
+  });
+}
