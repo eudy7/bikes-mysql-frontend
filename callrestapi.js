@@ -19,7 +19,7 @@ function postBike() {
   const imageFile = $('#image')[0].files[0];
 
   if (!brand || !model || !price || !description || !imageFile) {
-    alert("⚠️ Todos los campos son obligatorios, incluyendo la imagen.");
+    alert("Todos los campos son obligatorios, incluyendo la imagen.");
     return;
   }
 
@@ -37,27 +37,25 @@ function postBike() {
     processData: false,
     contentType: false,
     success: function () {
-      alert("✅ Bicicleta guardada");
+      alert("Bicicleta guardada");
       getBikes();
-      $('#bikeForm')[0].reset()
+      $('#bikeForm')[0].reset();
     },
     error: function () {
-      alert("❌ Error al guardar bicicleta");
+      alert("Error al guardar bicicleta");
     },
   });
 }
 
 function getBikes() {
   $.getJSON(url, function (response) {
-    console.log("✅ Respuesta del backend:", response);
-
     const bikes = Array.isArray(response) ? response : response.bikes;
 
     let html = `
       <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 1em;">
         <thead>
           <tr>
-            <th>ID</th><th>Brand</th><th>Model</th><th>Price</th><th>Description</th><th>Image</th>
+            <th>ID</th><th>Brand</th><th>Model</th><th>Price</th><th>Description</th><th>Image</th><th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -76,6 +74,10 @@ function getBikes() {
           <td>$${bike.price}</td>
           <td>${bike.description}</td>
           <td>${imgTag}</td>
+          <td>
+            <button onclick="editBike(${bike.id})">Editar</button>
+            <button onclick="deleteBike(${bike.id})">Eliminar</button>
+          </td>
         </tr>
       `;
     });
@@ -83,7 +85,43 @@ function getBikes() {
     html += `</tbody></table>`;
     $('#resultado').html(html);
   }).fail((xhr) => {
-    console.error("❌ Error en el GET:", xhr);
-    alert("❌ Error al obtener bicicletas");
+    console.error("Error en el GET:", xhr);
+    alert("Error al obtener bicicletas");
   });
 }
+
+function deleteBike(id) {
+  if (!confirm("¿Estás seguro de que deseas eliminar esta bicicleta?")) return;
+
+  $.ajax({
+    url: `${url}/${id}`,
+    type: "DELETE",
+    success: function () {
+      alert("Bicicleta eliminada");
+      getBikes();
+    },
+    error: function () {
+      alert("Error al eliminar la bicicleta");
+    }
+  });
+}
+
+function editBike(id) {
+  const brand = prompt("Nuevo brand:");
+  const model = prompt("Nuevo model:");
+  const price = prompt("Nuevo price:");
+  const description = prompt("Nueva descripción:");
+
+  if (!brand || !model || !price || !description) {
+    alert("Todos los campos son obligatorios.");
+    return;
+  }
+
+  $.ajax({
+    url: `${url}/${id}`,
+    type: "PUT",
+    contentType: "application/json",
+    data: JSON.stringify({ brand, model, price, description }),
+    success: function () {
+      alert("Bicicleta actualizada");
+      getB
