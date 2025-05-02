@@ -9,6 +9,11 @@ $(document).ready(function () {
     e.preventDefault();
     postBike();
   });
+
+  $('#editForm').on('submit', function (e) {
+    e.preventDefault();
+    updateBike();
+  });
 });
 
 function postBike() {
@@ -75,7 +80,7 @@ function getBikes() {
           <td>${bike.description}</td>
           <td>${imgTag}</td>
           <td>
-            <button onclick="editBike(${bike.id})">Editar</button>
+            <button onclick="openEditModal(${bike.id}, '${bike.brand}', '${bike.model}', '${bike.price}', '${bike.description}')">Editar</button>
             <button onclick="deleteBike(${bike.id})">Eliminar</button>
           </td>
         </tr>
@@ -106,16 +111,27 @@ function deleteBike(id) {
   });
 }
 
-function editBike(id) {
-  const brand = prompt("Nuevo brand:");
-  const model = prompt("Nuevo model:");
-  const price = prompt("Nuevo price:");
-  const description = prompt("Nueva descripción:");
+function openEditModal(id, brand, model, price, description) {
+  $('#editId').val(id);
+  $('#editBrand').val(brand);
+  $('#editModel').val(model);
+  $('#editPrice').val(price);
+  $('#editDescription').val(description);
+  $('#overlay').show();
+  $('#editModal').show();
+}
 
-  if (!brand || !model || !price || !description) {
-    alert("Todos los campos son obligatorios.");
-    return;
-  }
+function closeModal() {
+  $('#overlay').hide();
+  $('#editModal').hide();
+}
+
+function updateBike() {
+  const id = $('#editId').val();
+  const brand = $('#editBrand').val();
+  const model = $('#editModel').val();
+  const price = $('#editPrice').val();
+  const description = $('#editDescription').val();
 
   $.ajax({
     url: `${url}/${id}`,
@@ -124,6 +140,7 @@ function editBike(id) {
     data: JSON.stringify({ brand, model, price, description }),
     success: function () {
       alert("Bicicleta actualizada");
+      closeModal();
       getBikes();
     },
     error: function () {
